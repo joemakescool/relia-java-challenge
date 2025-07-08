@@ -1,27 +1,31 @@
 package com.reliaquest.api.controller;
 
 import com.reliaquest.api.model.EmployeeDTO;
-import com.reliaquest.api.model.EmployeeWrapper;
+import com.reliaquest.api.service.EmployeeService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import java.util.Collections;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/employee")
 public class EmployeeController implements IEmployeeController {
 
-    private final WebClient webClient = WebClient.create("http://localhost:8112/server/v1");
+    private final WebClient webServer = WebClient.create("http://localhost:8112/server/v1");
+
+    @Autowired
+    EmployeeService employeeService;
 
 
     @GetMapping("/test-server")
     public String testServerConnection() {
 
-        return String.valueOf(webClient.get()
+        return String.valueOf(webServer.get()
                 .uri("/employee/test")
                 .retrieve()
                 .bodyToFlux(String.class)  // get Flux<EmployeeDTO>
@@ -37,38 +41,41 @@ public class EmployeeController implements IEmployeeController {
     @Override
     @GetMapping("/all-employees")
     public ResponseEntity<List<EmployeeDTO>> getAllEmployees() {
-        EmployeeWrapper wrapper = webClient.get()
-                .uri("/employee")
-                .retrieve()
-                .bodyToMono(EmployeeWrapper.class)
-                .log()
-                .block();
-
-        List<EmployeeDTO> employees = wrapper != null && wrapper.getEmployees() != null
-                ? wrapper.getEmployees()
-                : Collections.emptyList();
+        List<EmployeeDTO> employees = employeeService.getAllEmployees();
 
         return ResponseEntity.ok(employees);
     }
 
     @Override
-    public ResponseEntity<List> getEmployeesByNameSearch(String searchString) {
-        return null;
+    @GetMapping("/names/{name}")
+    public ResponseEntity<List<EmployeeDTO>> getEmployeesByNameSearch(@PathVariable String name) {
+        List<EmployeeDTO> employees = employeeService.getEmployeesByNameSearch(name);
+
+        return ResponseEntity.ok(employees);
     }
 
     @Override
-    public ResponseEntity getEmployeeById(String id) {
-        return null;
+    @GetMapping("/id/{id}")
+    public ResponseEntity<EmployeeDTO> getEmployeeById(@PathVariable String id) {
+        EmployeeDTO employee = employeeService.getEmployeeById(id);
+
+        return ResponseEntity.ok(employee);
     }
 
     @Override
+    @GetMapping("/highest-salary")
     public ResponseEntity<Integer> getHighestSalaryOfEmployees() {
-        return null;
+        Integer highestSalary = employeeService.getHighestSalaryOfEmployees();
+
+        return ResponseEntity.ok(highestSalary);
     }
 
     @Override
+    @GetMapping("/top-ten")
     public ResponseEntity<List<String>> getTopTenHighestEarningEmployeeNames() {
-        return null;
+        List<String> topTenners = employeeService.getTopTenHighestEarningEmployeeNames();
+
+        return ResponseEntity.ok(topTenners);
     }
 
     @Override

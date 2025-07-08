@@ -1,24 +1,26 @@
 package com.reliaquest.api;
 
 import com.reliaquest.api.model.EmployeeDTO;
-import com.reliaquest.api.model.EmployeeWrapper;
+import com.reliaquest.api.service.EmployeeService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.mockito.Spy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Flux;
 
-import java.util.Arrays;
+import java.util.List;
+import java.util.UUID;
 
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @AutoConfigureMockMvc
@@ -45,43 +47,78 @@ class ApiApplicationTest {
     @Mock
     private WebClient.ResponseSpec responseSpec;
 
+    @MockBean
+    EmployeeService employeeService;
+
+    @Spy
+    private EmployeeService employeeServicespy;
+
+    List<EmployeeDTO> mockList = List.of(
+            new EmployeeDTO(UUID.randomUUID().toString(), "Hans Herzog", "324832", "58", "Consultant", "hans@example.com"),
+            new EmployeeDTO(UUID.randomUUID().toString(), "Hans Low", "32", "58", "Consultant", "hans@example.com"),
+            new EmployeeDTO(UUID.randomUUID().toString(), "Hans Mid", "3248", "58", "Consultant", "hans@example.com"),
+            new EmployeeDTO(UUID.randomUUID().toString(), "Joe Biden", "1000", "58", "Consultant", "hans@example.com"),
+            new EmployeeDTO(UUID.randomUUID().toString(), "Donald Trump", "100100000", "58", "Consultant", "hans@example.com")
+    );
+
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
     }
+
     @Test
-    void testGetAllEmployees() throws Exception {
-        // Arrange
-        EmployeeDTO emp1 = new EmployeeDTO();
-        emp1.setId("1");
-        emp1.setEmployee_name("Alice");
-        emp1.setEmployee_salary("100");
-        emp1.setEmployee_age("3");
-        emp1.setEmployee_title("testing data");
-        emp1.setEmployee_email("test_email@gmail.com");
+    void testGetEmployeesByNameSearch() throws Exception {
+        // Given
+        String name = "Hans";
 
-        EmployeeDTO emp2 = new EmployeeDTO();
-        emp2.setId("2");
-        emp2.setEmployee_name("Bob");
-        emp2.setEmployee_salary("100");
-        emp2.setEmployee_age("3");
-        emp2.setEmployee_title("testing data");
-        emp2.setEmployee_email("test_email@gmail.com");
+        // When
+        Mockito.when(employeeService.getEmployeesByNameSearch(name)).thenReturn(mockList);
 
-        EmployeeWrapper wrapper = new EmployeeWrapper();
-        wrapper.setEmployees(Arrays.asList(emp1, emp2));
-
-        // Act
-        when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
-        when(responseSpec.bodyToFlux(EmployeeWrapper.class)).thenReturn(Flux.just(wrapper));
-
-        // Assert
-        mockMvc.perform(get("/api/v1/employee/all-employees"))
+        // Then
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/employee/names/{name}", name))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$[0].id").value("4e144fd5-4b90-4715-86d0-37b098cdc6ef"))
-                .andExpect(jsonPath("$[0].employee_name").value("Farrah Wehner"))
-                .andExpect(jsonPath("$[1].id").value("30935567-2075-40cc-afd8-6b43da3a93aa"))
-                .andExpect(jsonPath("$[1].employee_name").value("Boyd Stark"));
+                .andExpect(jsonPath("$[0].employee_name").value("Hans Herzog"))
+                .andExpect(jsonPath("$[1].employee_name").value("Hans Low"));
+    }
+
+    @Test
+    void testGetAllEmployees() throws Exception {
+        // When
+        Mockito.when(employeeService.getAllEmployees()).thenReturn(mockList);
+
+        // Then
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/employee/all-employees"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.length()").value(mockList.size()))
+                .andExpect(jsonPath("$[0].employee_name").value("Hans Herzog"))
+                .andExpect(jsonPath("$[1].employee_name").value("Hans Low"))
+                .andExpect(jsonPath("$[4].employee_name").value("Donald Trump"));
+    }
+
+    @Test
+    void testGetHighestSalaryOfEmployees()  {
+        // Mock getAllEmployees to return mock list
+        Mockito.doReturn(mockList).when(employeeServicespy).getAllEmployees();
+
+        // When
+        Integer highestSalary = employeeServicespy.getHighestSalaryOfEmployees();
+
+        // Then
+        assertEquals(100100000, highestSalary);
+    }
+
+    @Test
+    void testGetTopTenHighestEarningEmployeeNames() {
+        // When
+        Mockito.doReturn(mockList).when(employeeServicespy).getAllEmployees();
+        List<String> topTen = employeeServicespy.getTopTenHighestEarningEmployeeNames();
+
+        List<String> expected = List.of(
+                "Donald Trump", "Hans Herzog", "Hans Mid", "Joe Biden", "Hans Low"
+        );
+
+        assertEquals(expected, topTen);
     }
 }

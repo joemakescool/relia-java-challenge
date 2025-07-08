@@ -1,8 +1,10 @@
 package com.reliaquest.api.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
+@AllArgsConstructor
 public class EmployeeDTO {
     private String id;
     private String employee_name;
