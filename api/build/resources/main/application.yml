@@ -1,2 +1,6 @@
 spring.application.name: employee-api
 server.port: 8111
+
+employee:
+  client:
+    base-url: http://localhost:8112/server/v1

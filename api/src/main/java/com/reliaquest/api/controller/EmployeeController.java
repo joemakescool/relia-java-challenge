@@ -1,90 +1,59 @@
 package com.reliaquest.api.controller;
 
+import com.reliaquest.api.model.CreateEmployeeRequest;
 import com.reliaquest.api.model.EmployeeDTO;
 import com.reliaquest.api.service.EmployeeService;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.validation.Valid;
+import java.net.URI;
+import java.util.List;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.reactive.function.client.WebClient;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/employee")
-public class EmployeeController implements IEmployeeController {
+@RequiredArgsConstructor
+public class EmployeeController implements IEmployeeController<EmployeeDTO, CreateEmployeeRequest> {
 
-    private final WebClient webServer = WebClient.create("http://localhost:8112/server/v1");
-
-    @Autowired
-    EmployeeService employeeService;
-
-
-    @GetMapping("/test-server")
-    public String testServerConnection() {
-
-        return String.valueOf(webServer.get()
-                .uri("/employee/test")
-                .retrieve()
-                .bodyToFlux(String.class)  // get Flux<EmployeeDTO>
-                .collectList()  // convert to Mono<List<EmployeeDTO>>
-                .block());
-    }
-
-    @GetMapping("/test")
-    public String testMeOut() {
-        return "Here is a test :!";
-    }
+    private final EmployeeService employeeService;
 
     @Override
-    @GetMapping("/all-employees")
     public ResponseEntity<List<EmployeeDTO>> getAllEmployees() {
-        List<EmployeeDTO> employees = employeeService.getAllEmployees();
-
-        return ResponseEntity.ok(employees);
+        return ResponseEntity.ok(employeeService.getAllEmployees());
     }
 
     @Override
-    @GetMapping("/names/{name}")
-    public ResponseEntity<List<EmployeeDTO>> getEmployeesByNameSearch(@PathVariable String name) {
-        List<EmployeeDTO> employees = employeeService.getEmployeesByNameSearch(name);
-
-        return ResponseEntity.ok(employees);
+    public ResponseEntity<List<EmployeeDTO>> getEmployeesByNameSearch(String searchString) {
+        return ResponseEntity.ok(employeeService.getEmployeesByNameSearch(searchString));
     }
 
     @Override
-    @GetMapping("/id/{id}")
-    public ResponseEntity<EmployeeDTO> getEmployeeById(@PathVariable String id) {
-        EmployeeDTO employee = employeeService.getEmployeeById(id);
-
-        return ResponseEntity.ok(employee);
+    public ResponseEntity<EmployeeDTO> getEmployeeById(String id) {
+        return ResponseEntity.ok(employeeService.getEmployeeById(id));
     }
 
     @Override
-    @GetMapping("/highest-salary")
     public ResponseEntity<Integer> getHighestSalaryOfEmployees() {
-        Integer highestSalary = employeeService.getHighestSalaryOfEmployees();
-
-        return ResponseEntity.ok(highestSalary);
+        return ResponseEntity.ok(employeeService.getHighestSalaryOfEmployees());
     }
 
     @Override
-    @GetMapping("/top-ten")
     public ResponseEntity<List<String>> getTopTenHighestEarningEmployeeNames() {
-        List<String> topTenners = employeeService.getTopTenHighestEarningEmployeeNames();
-
-        return ResponseEntity.ok(topTenners);
+        return ResponseEntity.ok(employeeService.getTopTenHighestEarningEmployeeNames());
     }
 
     @Override
-    public ResponseEntity createEmployee(Object employeeInput) {
-        return null;
+    public ResponseEntity<EmployeeDTO> createEmployee(@RequestBody @Valid CreateEmployeeRequest employeeInput) {
+        EmployeeDTO employee = employeeService.createEmployee(employeeInput);
+        return ResponseEntity.created(URI.create("/api/v1/employee/" + employee.getId()))
+                .body(employee);
     }
 
     @Override
     public ResponseEntity<String> deleteEmployeeById(String id) {
-        return null;
+        String name = employeeService.deleteEmployeeById(id);
+        return ResponseEntity.ok(name);
     }
 }

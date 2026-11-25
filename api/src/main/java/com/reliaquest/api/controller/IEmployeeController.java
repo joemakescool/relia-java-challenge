@@ -1,9 +1,8 @@
 package com.reliaquest.api.controller;
 
+import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 /**
  * Please <b>do not</b> modify this interface. If you believe there's a bug or the API contract does not align with our

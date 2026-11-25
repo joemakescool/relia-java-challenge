@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.reliaquest.api.service.EmployeeServiceTest" tests="17" skipped="0" failures="0" errors="0" timestamp="2026-11-24T23:20:58.766Z" hostname="TL-JOEBARKER" time="0.691">
+  <properties/>
+  <testcase name="getEmployeeById_propagatesNonNotFoundErrorsUnmodified()" classname="com.reliaquest.api.service.EmployeeServiceTest" time="0.493"/>
+  <testcase name="getEmployeesByNameSearch_returnsEmptyListWhenNoMatches()" classname="com.reliaquest.api.service.EmployeeServiceTest" time="0.031"/>
+  <testcase name="getEmployeeById_throwsEmployeeNotFoundOn404()" classname="com.reliaquest.api.service.EmployeeServiceTest" time="0.009"/>
+  <testcase name="createEmployee_propagatesDownstreamValidationFailureUnmodified()" classname="com.reliaquest.api.service.EmployeeServiceTest" time="0.019"/>
+  <testcase name="getHighestSalaryOfEmployees_throwsWhenNoEmployeesExist()" classname="com.reliaquest.api.service.EmployeeServiceTest" time="0.009"/>
+  <testcase name="getEmployeesByNameSearch_filtersFetchedEmployees()" classname="com.reliaquest.api.service.EmployeeServiceTest" time="0.008"/>
+  <testcase name="getTopTenHighestEarningEmployeeNames_returnsTopTenSortedDescending()" classname="com.reliaquest.api.service.EmployeeServiceTest" time="0.009"/>
+  <testcase name="deleteEmployeeById_neverCallsDeleteWhenLookupFails()" classname="com.reliaquest.api.service.EmployeeServiceTest" time="0.008"/>
+  <testcase name="deleteEmployeeById_throwsWhenDownstreamReportsNoDeletion()" classname="com.reliaquest.api.service.EmployeeServiceTest" time="0.022"/>
+  <testcase name="getAllEmployees_returnsEmptyListWhenDownstreamHasNoEmployees()" classname="com.reliaquest.api.service.EmployeeServiceTest" time="0.009"/>
+  <testcase name="createEmployee_throwsWhenDownstreamReturnsNoData()" classname="com.reliaquest.api.service.EmployeeServiceTest" time="0.012"/>
+  <testcase name="deleteEmployeeById_looksUpThenDeletesByName()" classname="com.reliaquest.api.service.EmployeeServiceTest" time="0.015"/>
+  <testcase name="getAllEmployees_fetchesAndParsesEmployeeList()" classname="com.reliaquest.api.service.EmployeeServiceTest" time="0.009"/>
+  <testcase name="getTopTenHighestEarningEmployeeNames_returnsFewerThanTenWhenNotEnoughEmployees()" classname="com.reliaquest.api.service.EmployeeServiceTest" time="0.008"/>
+  <testcase name="getEmployeeById_returnsEmployeeForRealId()" classname="com.reliaquest.api.service.EmployeeServiceTest" time="0.007"/>
+  <testcase name="createEmployee_sendsRequestAndParsesCreatedEmployee()" classname="com.reliaquest.api.service.EmployeeServiceTest" time="0.011"/>
+  <testcase name="getHighestSalaryOfEmployees_returnsMaxSalary()" classname="com.reliaquest.api.service.EmployeeServiceTest" time="0.006"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,5 +1,6 @@
 package com.reliaquest.api.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -7,9 +8,19 @@ import lombok.Data;
 @AllArgsConstructor
 public class EmployeeDTO {
     private String id;
-    private String employee_name;
-    private String employee_salary;
-    private String employee_age;
-    private String employee_title;
-    private String employee_email;
+
+    @JsonProperty("employee_name")
+    private String employeeName;
+
+    @JsonProperty("employee_salary")
+    private Integer employeeSalary;
+
+    @JsonProperty("employee_age")
+    private Integer employeeAge;
+
+    @JsonProperty("employee_title")
+    private String employeeTitle;
+
+    @JsonProperty("employee_email")
+    private String employeeEmail;
 }

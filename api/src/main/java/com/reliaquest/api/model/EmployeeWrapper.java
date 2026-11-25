@@ -1,17 +1,7 @@
 package com.reliaquest.api.model;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import java.util.List;
-
-public class EmployeeWrapper {
-    @JsonProperty("data")
-    private List<EmployeeDTO> employees;
-
-    public List<EmployeeDTO> getEmployees() {
-        return employees;
-    }
-
-    public void setEmployees(List<EmployeeDTO> employees) {
-        this.employees = employees;
-    }
-}
+/**
+ * Mirrors the mock server's {@code {"data": ..., "status": "..."}} envelope.
+ * Parameterized so the same type covers both the list and single-employee response shapes.
+ */
+public record EmployeeWrapper<T>(T data, String status) {}
